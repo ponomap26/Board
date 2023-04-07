@@ -1,0 +1,25 @@
+{% extends 'flatpages/default.html' %}
+{% block title %}
+Ad
+{% endblock title %}
+{% block content %}
+<form action="your_view" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+</form>
+    <table>
+        <tr>
+               <td>Описание</td>
+               <td>Текст</td>
+
+
+        <tr>
+                <td>{{ blog.title }}<td>
+                <td>{{ blog.content }}<td>
+                {% if blog.image %}
+                <img src="{{ MEDIA_URL }}{{ blog.image.url }}" width="500">
+                {% endif %}
+                <td>
+     <table>
+{% endblock content %}
