@@ -20,12 +20,18 @@ from django.template.defaulttags import url
 from django.urls import path, include # new
 from django.conf.urls.static import static # new
 
+from accounts.views import endreg
+from accounts.views_2 import activate
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("accounts/", include("allauth.urls")),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path("accounts/", include("accounts.urls")),
     path('pages/', include('django.contrib.flatpages.urls')),
     path('blogs/',  include('brd.urls')),
+    # path('codeAp/', endreg, name='signup_code')
+    # path('activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/',activate, name='activate'),
+
 
     # path('show_upload/', views.show_upload),  # Страница загрузки изображения
     # path('upload_handle/', views.upload_handle),  # Страница обработки загрузки изображения

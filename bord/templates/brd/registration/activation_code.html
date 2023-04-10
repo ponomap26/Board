@@ -1,0 +1,17 @@
+html
+{% extends "flatpages/default.html" %}
+{% block title %}Активация аккаунта{% endblock %}
+
+{% block content %}
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Активировать</button>
+  </form>
+{% endblock %}
+```
+
+После добавления шаблона, убедитесь, что в `accounts/views.py` используется правильное имя шаблона:
+
+```python
+return render(request, 'registration/activation_code.html', {'form': form})

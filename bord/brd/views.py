@@ -1,12 +1,7 @@
-# from django.contrib.auth import authenticate, login
-# from django.contrib.auth.decorators import login_required
+
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
-# from django.contrib.auth.models import User
-# from django.shortcuts import render, redirect
-from django.core.cache import cache
-from django.http import HttpResponse
-# Create your views here.
-from django.shortcuts import render, get_object_or_404, redirect
+
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 
@@ -99,20 +94,20 @@ class BlogsCreate(LoginRequiredMixin, CreateView):
 
 
 
-class CategoryListView(BlogsList):
-    model = Ad
-    template_name = 'category_list.html'
-    context_object_name = 'category_blogs_list'
-
-    def get_queryset(self):
-        self.category = get_object_or_404(Category, id=self.kwargs['pk'])
-        queryset = Ad.objects.filter(category=self.category).order_by('-created_at')
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['is_not_subscriber'] = self.request.user not in self.category.subscribers.all()
-        print(f'{context = }')
-        context['categories'] = self.category
-
-        return context
+# class CategoryListView(BlogsList):
+#     model = Ad
+#     template_name = 'category_list.html'
+#     context_object_name = 'category_blogs_list'
+#
+#     def get_queryset(self):
+#         self.category = get_object_or_404( id=self.kwargs['pk'])
+#         queryset = Ad.objects.filter(category=self.category).order_by('-created_at')
+#         return queryset
+#
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['is_not_subscriber'] = self.request.user not in self.category.subscribers.all()
+#         print(f'{context = }')
+#         context['categories'] = self.category
+#
+#         return context

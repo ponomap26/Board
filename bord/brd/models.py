@@ -16,7 +16,9 @@ from django.contrib.auth.models import User
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, related_name='profile', default=None, on_delete=models.CASCADE)
+    code = models.CharField(max_length=50, blank=True, null=True, default=None)
+    date = models.DateField(blank=True, null=True)
 
 
 """ модель для объявлений"""
@@ -70,8 +72,8 @@ class Ad(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     image = models.ImageField(upload_to='media/', blank=True, null=True, max_length=255)
 
-    def __str__(self):
-        return f'{self.name}'
+    # def __str__(self):
+    #     return f'{self.name}'
 
     """модель для откликов"""
 
@@ -92,11 +94,10 @@ class Notification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
 
-
 #
 # class BlogsCategory(models.Model):
 #     blogs = models.ForeignKey(Ad, on_delete=models.CASCADE)
 #     category = models.ForeignKey(on_delete=models.CASCADE)
 
-    # def __str__(self):
-    #     return f'{self.name}'
+# def __str__(self):
+#     return f'{self.name}'
