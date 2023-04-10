@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+{% if user.is_authenticated %}
+    <p>Привет, {{ user.username }} !</p>
+{% else %}
+    <p>Добро пожаловать, Гость!</p>
+{% endif %}
     <head>
+
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />

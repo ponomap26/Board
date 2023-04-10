@@ -17,8 +17,7 @@ Ad
 
 <hr>
                <td>Описание</td>
-               <td>категория</td>
-               <td>содержание</td>
+                <td>содержание</td>
 
 {% if blogs %}
             <tr>
@@ -27,12 +26,9 @@ Ad
             <td>
             <a href="{% url 'blog' blog.id %}">{{ blog.title }}</a>
 
-            {% for category in blogs.category.all %}
-            <a href="{% url 'category_list' category.id %}"class="btn btn-secondary " >{{ blog.category }}</a>
-            {% endfor %}
-            </td>
 
             <td>{{ blog.content|truncatewords:70}}</td>
+            <td>{{ blog.authors}}</td>
         <td>
             {% if blog.image %}
             <img src="{{ MEDIA_URL }}{{ blog.image.url }}" width="300">

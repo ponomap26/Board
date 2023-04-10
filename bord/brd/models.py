@@ -67,7 +67,7 @@ class Ad(models.Model):
     content = models.TextField()
     category = models.CharField(max_length=200, choices=CATEGORY_CHOICES,
                                 default=ТАНКИ, help_text=('Название категории'))
-    # created_by = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='ads')
+    created_by = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='ads')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     image = models.ImageField(upload_to='media/', blank=True, null=True, max_length=255)

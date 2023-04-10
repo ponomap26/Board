@@ -1,14 +1,13 @@
-
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 
-
 from .filters import BlogFilter
-from .forms import BordForm
-from .models import Ad, Author, Profile
+from .forms import BordForm, ResponseForm
+from .models import Ad, Author, Profile, Response
 
 
 class BlogsList(ListView):
@@ -31,17 +30,6 @@ class BlogsDetail(DetailView):
     context_object_name = 'blog'
     queryset = Ad.objects.all()
 
-    # def get_object(self, *args, **kwargs):
-    #     obj = cache.get(f'blog{self.kwargs["pk"]}', None)
-    #
-    #     if not obj:
-    #         obj = super().get_object(queryset=self.queryset)
-    #         cache.set(f'blog{self.kwargs["pk"]}', obj)
-    #         # print("2222")
-    #     else:
-    #         print("Кешь есть")
-    #     return obj
-
 
 class BlogsSearch(ListView):
     # Указываем модель, объекты которой мы будем выводить
@@ -62,12 +50,14 @@ class BlogsSearch(ListView):
         self.filterset = BlogFilter(self.request.GET, queryset)
         # Возвращаем из функции отфильтрованный список товаров
         return self.filterset.qs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Добавляем в контекст объект фильтрации.
         context['filterset'] = self.filterset
         context['all_blogs'] = Ad.objects.all()
         return context
+
 
 class BlogsCreate(LoginRequiredMixin, CreateView):
     form_class = BordForm
@@ -80,34 +70,61 @@ class BlogsCreate(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         # Получаем текущего пользователя
         user = self.request.user
+        # Создаем объект Ad, но не сохраняем его пока
+        ad = form.save(commit=False)
         # Проверяем, есть ли объект Author для этого пользователя
         try:
             author = Author.objects.get(authorUser=user)
         except Author.DoesNotExist:
             # Если объект Author не существует, создаем его
             author = Author.objects.create(authorUser=user)
-        # Устанавливаем созданного автора для формы Ad
-        form.instance.author = author
+        # Устанавливаем созданного автора и пользователя для Ad
+        ad.author = author
+        ad.created_by = user.profile
+        # Сохраняем объект Ad
+        ad.save()
         return super().form_valid(form)
 
 
+@login_required
+def add_response(request, ad_id):
+    ad = get_object_or_404(Ad, id=ad_id)
+    if request.method == 'POST':
+        form = ResponseForm(request.POST)
+        if form.is_valid():
+            response = form.save(commit=False)
+            response.created_by = request.user.profile  # использование модели Profile
+            response.ad = ad
+            response.save()
+            return redirect('add_response', ad_id=ad_id)
+    else:
+        form = ResponseForm()
+    context = {'form': form, 'ad': ad}
+    return render(request, 'add_response.html', context)
 
 
+def add_comment_view(request, ad_id):
+    """
+    Обработчик формы добавления комментария.
+    """
+    ad = Ad.objects.get(id=ad_id)
 
-# class CategoryListView(BlogsList):
-#     model = Ad
-#     template_name = 'category_list.html'
-#     context_object_name = 'category_blogs_list'
-#
-#     def get_queryset(self):
-#         self.category = get_object_or_404( id=self.kwargs['pk'])
-#         queryset = Ad.objects.filter(category=self.category).order_by('-created_at')
-#         return queryset
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['is_not_subscriber'] = self.request.user not in self.category.subscribers.all()
-#         print(f'{context = }')
-#         context['categories'] = self.category
-#
-#         return context
+    if request.method == 'POST':
+        form = ResponseForm(request.POST)
+
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            body = form.cleaned_data['body']
+
+            comment = Response.objects.create(
+                ad=ad,
+                name=name
+
+            )
+
+            return redirect('blog', blog_id=ad.blog.id)
+
+    else:
+        form = ResponseForm()
+
+    return render(request, 'add_comment.html', {'form': form})

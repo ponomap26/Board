@@ -22,4 +22,20 @@ Ad
                 {% endif %}
                 <td>
      <table>
-{% endblock content %}
+
+
+
+
+
+        <a href="{% url 'add_response' blog.id %}"class="btn btn-secondary btn-sm">>Написать отзыв</button>
+
+ <hr>
+{% if name %}
+    <h3>Комментарии</h3>
+    {% for contents in content %}
+        <td>{{ content.content}}</td>
+    {% empty %}
+        <p>Нет комментариев</p>
+    {% endfor %}
+{% endif %}
+{% endblock %}
