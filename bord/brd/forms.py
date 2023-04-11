@@ -10,7 +10,8 @@ class BordForm(forms.ModelForm):
 
     class Meta:
         model = Ad
-        fields = ['category', 'content',  'title', 'image']
+        fields = ['category', 'content', 'title', 'image']
+
 
 class ResponseForm(forms.ModelForm):
     content = forms.CharField(widget=forms.Textarea(attrs={'rows': 4}))
@@ -21,7 +22,6 @@ class ResponseForm(forms.ModelForm):
 
 
 class BlogsDelete(forms.ModelForm):
-
     class Meta:
         model = Ad
         fields = []
@@ -33,3 +33,12 @@ class BlogsEdit(forms.ModelForm):
     class Meta:
         model = Ad
         fields = ['category', 'title', 'content', 'image']
+
+
+class ResponseForm(forms.ModelForm):
+    text = forms.CharField(widget=forms.Textarea)
+    class Meta:
+        model = Response
+        fields = ('text',)
+        labels = {'text': 'Комментарий'}
+        widgets = {'text': forms.Textarea}

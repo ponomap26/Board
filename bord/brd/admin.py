@@ -1,10 +1,10 @@
 from django.contrib import admin
 
 # Register your models here.
-from brd.models import Ad, Author, Response, Profile, Notification
+from brd.models import Ad, Author, Response, Profile
 
 admin.site.register(Ad)
 admin.site.register(Author)
 admin.site.register(Response)
 admin.site.register(Profile)
-admin.site.register(Notification)
+# admin.site.register(Notification)

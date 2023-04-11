@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from lib2to3.fixes.fix_input import context
@@ -15,7 +16,7 @@ from urllib3 import request
 
 from .filters import BlogFilter
 from .forms import BordForm, ResponseForm, BlogsDelete, BlogsEdit
-from .models import Ad, Author, Profile, Response, Notification
+from .models import Ad, Author, Profile, Response
 
 
 class BlogsList(ListView):
@@ -102,20 +103,20 @@ class BlogsDelete(LoginRequiredMixin, DeleteView):
     template_name = 'blogs_delete.html'
     success_url = reverse_lazy('blogs')
 
-    @login_required
-    def edit_ad(request, ad_id):
-        ad = get_object_or_404(Ad, id=ad_id)
-        if request.user == ad.author.authorUser:
-            return redirect('home')
-        if request.method == 'POST':
-            form = BlogsDelete(request.POST, instance=ad)
-            if form.is_valid():
-                ad = form.save(commit=False)
-                ad.save()
-                return redirect('blogs_delete', ad_id=ad.id)
-        else:
-            form = BlogsDelete(instance=ad)
-        return render(request, 'blog_delete.html', {'form': form, 'ad': ad})
+    # @login_required
+    # def edit_ad(request, ad_id):
+    #     ad = get_object_or_404(Ad, id=ad_id)
+    #     if request.user == ad.author.authorUser:
+    #         return redirect('home')
+    #     if request.method == 'POST':
+    #         form = BlogsDelete(request.POST, instance=ad)
+    #         if form.is_valid():
+    #             ad = form.save(commit=False)
+    #             ad.save()
+    #             return redirect('blogs_delete', ad_id=ad.id)
+    #     else:
+    #         form = BlogsDelete(instance=ad)
+    #     return render(request, 'blog_delete.html', {'form': form, 'ad': ad})
 
 
 class BlogsUpdate(LoginRequiredMixin, UpdateView):
@@ -149,44 +150,62 @@ def form_valid(self, form):
 
 
 @login_required
-def add_response(request, ad_id):
-    ad = get_object_or_404(Ad, id=ad_id)
+def add_response(request, pk):
+    ad = get_object_or_404(Ad, pk=pk)
     if request.method == 'POST':
         form = ResponseForm(request.POST)
         if form.is_valid():
             response = form.save(commit=False)
-            response.created_by = request.user.profile  # использование модели Profile
-            response.ad = ad
+            response.author = request.user
+            response.post = ad
             response.save()
-            return redirect('add_response', ad_id=ad_id)
-    else:
-        form = ResponseForm()
-    context = {'form': form, 'ad': ad}
-    return render(request, 'add_response.html', context)
-
-
-def add_comment_view(request, ad_id):
-    """
-    Обработчик формы добавления комментария.
-    """
-    ad = Ad.objects.get(id=ad_id)
-
-    if request.method == 'POST':
-        form = ResponseForm(request.POST)
-
-        if form.is_valid():
-            name = form.cleaned_data['name']
-            body = form.cleaned_data['body']
-
-            comment = Response.objects.create(
-                ad=ad,
-                name=name
-
-            )
-
-            return redirect('blog', blog_id=ad.blog.id)
-
     else:
         form = ResponseForm()
 
-    return render(request, 'add_comment.html', {'form': form})
+    return render(request, 'add_response.html', {'ad': ad, 'form': form})
+
+
+
+# def add_comment_view(request, ad_id):
+#     """
+#     Обработчик формы добавления комментария.
+#     """
+#     ad = Ad.objects.get(id=ad_id)
+#
+#     if request.method == 'POST':
+#         form = ResponseForm(request.POST)
+#
+#         if form.is_valid():
+#             name = form.cleaned_data['name']
+#             body = form.cleaned_data['body']
+#
+#             text = Response.objects.create(
+#                 ad=ad,
+#                 name=name
+#
+#             )
+#
+#             return redirect('blog', blog_id=ad.blog.id)
+#
+#     else:
+#         form = ResponseForm()
+#
+#     return render(request, 'add_comment.html', {'form': form})
+
+
+# @login_required
+# def ad_detail(request, ad_id):
+#     ad = get_object_or_404(Response, id=ad_id)
+#     response = ad.response.all()
+#     if request.method == 'POST':
+#         form = ResponseForm(request.POST)
+#         if form.is_valid():
+#             response = form.save(commit=False)
+#             response.ad = ad
+#             response.author = request.user
+#             response.save()
+#             messages.success(request, 'Ваш комментарий успешно добавлен!')
+#             return redirect('ad_detail', ad_id=ad_id)
+#     else:
+#         form = ResponseForm()
+#     return render(request, 'ad_detail.html', {'ad': ad, 'comments': content, 'form': form})

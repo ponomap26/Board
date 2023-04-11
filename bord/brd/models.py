@@ -79,20 +79,22 @@ class Ad(models.Model):
 
 
 class Response(models.Model):
-    content = models.TextField()
+    text = models.TextField()
     ad = models.ForeignKey(Ad, on_delete=models.CASCADE, related_name='responses')
-    created_by = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['-created_at']
 
 """модель для уведомлений"""
 
 
-class Notification(models.Model):
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    message = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_read = models.BooleanField(default=False)
+# class Notification(models.Model):
+#     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+#     message = models.TextField()
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     is_read = models.BooleanField(default=False)
 
 #
 # class BlogsCategory(models.Model):
