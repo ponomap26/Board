@@ -1,3 +1,9 @@
+from datetime import datetime
+
+from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect
+from lib2to3.fixes.fix_input import context
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.core.exceptions import ValidationError
@@ -5,10 +11,11 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
+from urllib3 import request
 
 from .filters import BlogFilter
 from .forms import BordForm, ResponseForm, BlogsDelete, BlogsEdit
-from .models import Ad, Author, Profile, Response
+from .models import Ad, Author, Profile, Response, Notification
 
 
 class BlogsList(ListView):
@@ -23,6 +30,7 @@ class BlogsList(ListView):
     # Его надо указать, чтобы обратиться к списку объектов в html-шаблоне.
     context_object_name = 'blogs'
     paginate_by = 10
+    # context['user_is_author'] = context['user_'] == context['ad_author']
 
 
 class BlogsDetail(DetailView):
@@ -60,7 +68,7 @@ class BlogsSearch(ListView):
         return context
 
 
-class BlogsCreate(LoginRequiredMixin, CreateView):
+class BlogsCreate(PermissionRequiredMixin, CreateView):
     form_class = BordForm
     raise_exception = True
     permission_required = ('blogs.add_blog',)
@@ -87,20 +95,36 @@ class BlogsCreate(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class BlogsDelete(PermissionRequiredMixin, DeleteView):
-    permission_required = ('blogs.delete_blog',)
+class BlogsDelete(LoginRequiredMixin, DeleteView):
+    # permission_required = ('blogs.delete_blog',)
     form_class = BlogsDelete
     model = Ad
     template_name = 'blogs_delete.html'
     success_url = reverse_lazy('blogs')
 
+    @login_required
+    def edit_ad(request, ad_id):
+        ad = get_object_or_404(Ad, id=ad_id)
+        if request.user == ad.author.authorUser:
+            return redirect('home')
+        if request.method == 'POST':
+            form = BlogsDelete(request.POST, instance=ad)
+            if form.is_valid():
+                ad = form.save(commit=False)
+                ad.save()
+                return redirect('blogs_delete', ad_id=ad.id)
+        else:
+            form = BlogsDelete(instance=ad)
+        return render(request, 'blog_delete.html', {'form': form, 'ad': ad})
 
-class BlogsUpdate(PermissionRequiredMixin, UpdateView):
+
+class BlogsUpdate(LoginRequiredMixin, UpdateView):
     raise_exception = True
-    permission_required = ('blogs.change_blog',)
+    # permission_required = ('blogs.change_blog',)
     form_class = BlogsEdit
     model = Ad
     template_name = 'blogs_edit.html'
+    success_url = reverse_lazy('blogs')
 
     def clean(self):
         cleaned_data = super().clean()
@@ -111,6 +135,17 @@ class BlogsUpdate(PermissionRequiredMixin, UpdateView):
             })
 
         return cleaned_data
+
+
+def form_valid(self, form):
+    # получить пользователя. Если Нет -> 404
+    author = form.save(commit=False)
+    if self.request.user.username:
+        author.author = User.objects.get(username=self.request.user.username)
+    else:
+        return HttpResponseRedirect('../404/')
+
+    return super().form_valid(form)
 
 
 @login_required

@@ -17,6 +17,7 @@ Ad
         <tr>
                 <td>{{ blog.title }}<td>
                 <td>{{ blog.content }}<td>
+                <td>{{ blog.created_at }}<td>
                 {% if blog.image %}
                 <img src="{{ MEDIA_URL }}{{ blog.image.url }}" width="500">
                 {% endif %}
