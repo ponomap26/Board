@@ -1,12 +1,13 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.core.exceptions import ValidationError
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 
 from .filters import BlogFilter
-from .forms import BordForm, ResponseForm
+from .forms import BordForm, ResponseForm, BlogsDelete, BlogsEdit
 from .models import Ad, Author, Profile, Response
 
 
@@ -84,6 +85,32 @@ class BlogsCreate(LoginRequiredMixin, CreateView):
         # Сохраняем объект Ad
         ad.save()
         return super().form_valid(form)
+
+
+class BlogsDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = ('blogs.delete_blog',)
+    form_class = BlogsDelete
+    model = Ad
+    template_name = 'blogs_delete.html'
+    success_url = reverse_lazy('blogs')
+
+
+class BlogsUpdate(PermissionRequiredMixin, UpdateView):
+    raise_exception = True
+    permission_required = ('blogs.change_blog',)
+    form_class = BlogsEdit
+    model = Ad
+    template_name = 'blogs_edit.html'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        title = cleaned_data.get("description")
+        if title is not None and len(title) > 15:
+            raise ValidationError({
+                "Название ": "Название не может быть больше 15 символов."
+            })
+
+        return cleaned_data
 
 
 @login_required

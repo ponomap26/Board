@@ -20,3 +20,16 @@ class ResponseForm(forms.ModelForm):
         fields = ['content']
 
 
+class BlogsDelete(forms.ModelForm):
+
+    class Meta:
+        model = Ad
+        fields = []
+
+
+class BlogsEdit(forms.ModelForm):
+    title = forms.CharField(min_length=15)
+
+    class Meta:
+        model = Ad
+        fields = ['category', 'title', 'content', 'image']
