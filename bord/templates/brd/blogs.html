@@ -37,6 +37,8 @@ Ad
                 <img src="{{ MEDIA_URL }}{{ blog.image.url }}" width="500">
                 {% endif %}
                 <td>
+    {% if request.user.is_authenticated %}
+        {% if user_is_author %}
             {# А здесь доступ для каждой ссылки теперь будем проверять отдельно #}
             {% if perms.blogs.change_blog %}
                 <a href="{% url 'blogs_edit' blog.id %}"class="btn btn-secondary btn-sm">Изменить</a>
@@ -44,7 +46,8 @@ Ad
             {% if perms.blogs.delete_blog %}
                 <a href="{% url 'blogs_delete' blog.id %}">Удалить</a>
             {% endif %}
-
+        {% endif %}
+    {% endif %}
         </td>
 
         {% endfor %}
