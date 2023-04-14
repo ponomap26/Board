@@ -149,6 +149,24 @@ def form_valid(self, form):
     return super().form_valid(form)
 
 
+class ResponseList(LoginRequiredMixin, ListView):
+    model = Response
+    # Поле, которое будет использоваться для сортировки объектов
+    ordering = 'created_at'
+    # Указываем имя шаблона, в котором будут все инструкции о том,
+    # как именно пользователю должны быть показаны наши объекты
+    template_name = 'ad_list.html'
+    # Это имя списка, в котором будут лежать все объекты.
+    # Его надо указать, чтобы обратиться к списку объектов в html-шаблоне.
+    context_object_name = 'response_list'
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['ad_list'] = Ad.objects.all()
+        return context
+
+
 @login_required
 def add_response(request, pk):
     ad = get_object_or_404(Ad, pk=pk)
@@ -157,14 +175,13 @@ def add_response(request, pk):
         if form.is_valid():
             response = form.save(commit=False)
             response.author = request.user
-            response.post = ad
+            response.ad = ad
             response.save()
+            return redirect('blog', pk=pk)
     else:
         form = ResponseForm()
 
     return render(request, 'add_response.html', {'ad': ad, 'form': form})
-
-
 
 # def add_comment_view(request, ad_id):
 #     """
@@ -193,19 +210,4 @@ def add_response(request, pk):
 #     return render(request, 'add_comment.html', {'form': form})
 
 
-# @login_required
-# def ad_detail(request, ad_id):
-#     ad = get_object_or_404(Response, id=ad_id)
-#     response = ad.response.all()
-#     if request.method == 'POST':
-#         form = ResponseForm(request.POST)
-#         if form.is_valid():
-#             response = form.save(commit=False)
-#             response.ad = ad
-#             response.author = request.user
-#             response.save()
-#             messages.success(request, 'Ваш комментарий успешно добавлен!')
-#             return redirect('ad_detail', ad_id=ad_id)
-#     else:
-#         form = ResponseForm()
-#     return render(request, 'ad_detail.html', {'ad': ad, 'comments': content, 'form': form})
+# class ResponseDelete(LoginRequiredMixin, DeleteView):

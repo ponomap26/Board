@@ -42,3 +42,10 @@ class ResponseForm(forms.ModelForm):
         fields = ('text',)
         labels = {'text': 'Комментарий'}
         widgets = {'text': forms.Textarea}
+
+    def save(self, commit=True):
+        response = super().save(commit=False)
+        if commit:
+            response.post = self.instance.post
+            response.save()
+        return response

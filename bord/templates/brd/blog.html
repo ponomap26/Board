@@ -8,31 +8,63 @@ Ad
     {{ form.as_p }}
 
 </form>
-    <table>
+<table class="table">
+    <thead>
         <tr>
-               <td>Описание</td>
-               <td>Текст</td>
-
-
+            <th>Описание</th>
+            <th>Текст</th>
+            <th>Дата создания</th>
+            <th>Изображение</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
         <tr>
-                <td>{{ blog.title }}<td>
-                <td>{{ blog.content }}<td>
-                <td>{{ blog.created_at }}<td>
+            <td>{{ blog.title }}</td>
+            <td>{{ blog.content }}</td>
+            <td>{{ blog.created_at }}</td>
+            <td>
                 {% if blog.image %}
-                <img src="{{ MEDIA_URL }}{{ blog.image.url }}" width="500">
+                    <img src="{{ MEDIA_URL }}{{ blog.image.url }}" width="500">
                 {% endif %}
-                <td>
-     <table>
+            </td>
+            <td>
+                <a href="{% url 'add_response' blog.id %}" class="btn btn-primary">Добавить комментарий</a>
+            </td>
+        </tr>
+    </tbody>
+</table>
 
+<hr>
 
+{% block AD %}
+<h1>Отклики на "{{ blog.title }}"</h1>
 
+{% if blog.responses.all %}
 
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Комментарий</th>
+                <th>Автор</th>
+                <th>Дата создания</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for response in blog.responses.all %}
+                <tr>
+                    {% if blog.author.authorUser == request.user %}
+                        <td>{{ response.text }}</td>
+                        <td>{{ response.author }}</td>
+                        <td>{{ response.created_at }}</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-        <a href="{% url 'add_response' blog.id %}" class="btn btn-primary">Добавить комментарий</a>
-
- <hr>
-{% block ad_comments %}
-  <label for="response_text">Текст отклика</label>
-
+{% else %}
+    <p>Нет откликов на этот блог.</p>
+{% endif %}
 {% endblock %}
-         {% endblock %}
+{% endblock %}

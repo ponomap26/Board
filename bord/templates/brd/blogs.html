@@ -18,7 +18,8 @@ Ad
         <a href="{% url 'create' %}"class="btn btn-secondary btn-sm">Добавить Объявление</a>
         {% endif %}
 {% if blogs %}
-<table>{% for blog in blogs %}
+<table>
+{% for blog in blogs %}
     <tr>
         <td>Описание</td>
         <td>Текст</td>
@@ -28,36 +29,33 @@ Ad
         {% if perms.blogs.change_blog or perms.blogs.delete_blog %}
         <td>Действия</td>
         {% endif %}
-
-
+    </tr>
     <tr>
-          <td> <a href="{% url 'blog' blog.id %}">{{ blog.title }}<td>
-           <td>{{ blog.content }}<td>
-           <td>{{ blog.created_at }}<td>
-           <td>{{ blog.author }}<td>
-           <td>{% if blog.image %}
+        <td><a href="{% url 'blog' blog.id %}">{{ blog.title }}</a></td>
+        <td>{{ blog.content }}</td>
+        <td>{{ blog.created_at }}</td>
+        <td>{{ blog.author }}</td>
+        <td>
+            {% if blog.image %}
                 <img src="{{ MEDIA_URL }}{{ blog.image.url }}" width="500">
             {% endif %}
-             <td>
-    {% if request.user.is_authenticated %}
-
-
+        </td>
+        {% if request.user.is_authenticated %}
+        <td>
             {%  if blog.author.authorUser == request.user  %}
             {# А здесь доступ для каждой ссылки теперь будем проверять отдельно #}
-
-                <a href="{% url 'blogs_edit' blog.id %}"class="btn btn-secondary btn-sm">Изменить</a>
-
-
+                <a href="{% url 'blogs_edit' blog.id %}" class="btn btn-secondary btn-sm">Изменить</a>
             {% endif %}
             {% if blog.author.authorUser == request.user %}
                 <a href="{% url 'blogs_delete' blog.id %}">Удалить</a>
             {% endif %}
 
-  </div>
-    {% endif %}
-        </td>
 
-        {% endfor %}
+        </td>
+        {% endif %}
+    </tr>
+{% endfor %}
+</table>
 
 </table>
 <hr>

@@ -1,18 +1,7 @@
 {% extends 'flatpages/default.html' %}
-{% block content %}
-  <h1>{{ ad.title }}</h1>
-  <p>{{ ad.content }}</p>
-
-  <h2>Оставить отклик</h2>
-  <form method="post">
-    {% csrf_token %}
-
-    {{ form.as_p }}
-  <input type="hidden" name="post" value="{{ ad.id }}">
-
-    <button type="submit">Отправить</button>
-  </form>
-
+{% block title %}
+Response
+{% endblock title %}
   {% if ad.responses.all %}
     <h2>Отклики ({{ ad.responses.count }})</h2>
     {% for response in ad.responses.all %}
@@ -23,4 +12,3 @@
       </div>
     {% endfor %}
   {% endif %}
-{% endblock %}
