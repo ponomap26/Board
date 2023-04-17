@@ -1,7 +1,3 @@
-from datetime import datetime
-
-import self as self
-from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 
@@ -12,11 +8,10 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
-from urllib3 import request
 
-from .filters import BlogFilter
+from .filters import BlogFilter, ResponseFilter
 from .forms import BordForm, ResponseForm, BlogsDelete, BlogsEdit
-from .models import Ad, Author, Profile, Response
+from .models import Ad, Author, Response
 
 
 class BlogsList(ListView):
@@ -154,6 +149,39 @@ class ResponseDelete(LoginRequiredMixin, DeleteView):
     model = Response
     template_name = 'response_delete.html'
     success_url = reverse_lazy('responses')
+
+
+class ResponseSearch(ListView):
+    # Указываем модель, объекты которой мы будем выводить
+    model = Ad
+    # Поле, которое будет использоваться для сортировки объектов
+    ordering = 'created_at'
+    # Указываем имя шаблона, в котором будут все инструкции о том,
+    # как именно пользователю должны быть показаны наши объекты
+    template_name = 'response_search.html'
+    # Это имя списка, в котором будут лежать все объекты.
+    # Его надо указать, чтобы обратиться к списку объектов в html-шаблоне.
+    context_object_name = 'response_search'
+    paginate_by = 10
+
+    def get_queryset(self):
+        # Получаем обычный запрос
+        queryset = super().get_queryset()
+        self.filterset = ResponseFilter(self.request.GET, queryset)
+        # Возвращаем из функции отфильтрованный список товаров
+        return self.filterset.qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Добавляем в контекст объект фильтрации.
+        context['filtersets'] = self.filterset
+        # context['all_blogs'] = Ad.objects.all()
+        return context
+        titles = Ad.objects.order_by('title').values_list('title', flat=True).distinct()
+        # Добавляем список в контекст представления
+        context['titles'] = titles
+        return context
+
 
 
 class UserResponseListView(LoginRequiredMixin, ListView):

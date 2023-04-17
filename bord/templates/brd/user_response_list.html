@@ -3,11 +3,12 @@
 {% block content %}
   <h1>Отклики на объявление {{ ad.title }}</h1>
   {% if responses %}
+ <a href="{% url 'response_search' %}" class="btn btn-secondary btn-sm">Отфильтровать</a>
     <table class="table">
       <thead>
         <tr>
           <th>Объявление</th>
-          <th>Комментарий</th>
+          <th>Отклики</th>
           <th>Автор</th>
           <th>Дата создания</th>
         </tr>

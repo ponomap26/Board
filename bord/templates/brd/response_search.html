@@ -1,0 +1,55 @@
+{% extends 'flatpages/default.html' %}
+{% block content %}
+<h1>Отклики на объявление </h1>
+<form method="get">
+    <label for="title-filter">Filter by title:</label>
+    <select name="title" id="title-filter">
+        {% for title in titles %}
+            <option value="{{ title }}">{{ title }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Filter</button>
+</form>
+<hr>
+{% if search %}
+<table>
+    <tr>
+        <td>Описание</td>
+
+        <td>Дата добавления</td>
+        <td>Содержание</td>
+    <tr>
+        {% for blog in search %}
+    <tr>
+        <td><a href="{% url 'blog' blog.id %}">{{ blog.title }}</a></td>
+
+        <td>{{ blog.created_at|date:'d M y ' }}</td>
+        <td>{{ blog.content}}</td>
+        {% endfor %}
+
+</table>
+<hr>
+{% else %}
+<h2>Новостей нет!</h2>
+{% endif %}
+{# Информация о предыдущих страницах #}
+{% if page_obj.has_previous %}
+<a href="?page=1">1</a>
+{% if page_obj.previous_page_number != 1 %}
+...
+<a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+{% endif %}
+{% endif %}
+
+{# Информация о текущей странице #}
+{{ page_obj.number }}
+
+{# Информация о следующих страницах #}
+{% if page_obj.has_next %}
+<a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+{% if paginator.num_pages != page_obj.next_page_number %}
+...
+<a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+{% endif %}
+{% endif %}
+{% endblock content %}
