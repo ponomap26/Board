@@ -1,0 +1,33 @@
+{% extends 'flatpages/default.html' %}
+
+{% block content %}
+  <h1>Отклики на объявление {{ ad.title }}</h1>
+  {% if responses %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Объявление</th>
+          <th>Комментарий</th>
+          <th>Автор</th>
+          <th>Дата создания</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for response in responses %}
+          <tr>
+            <td>{{ response.ad.title }}</td>
+            <td>{{ response.text }}</td>
+            <td>{{ response.author }}</td>
+            <td>{{ response.created_at }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4">На ваше объявление пока нет откликов.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>На ваше объявление пока нет откликов.</p>
+  {% endif %}
+{% endblock %}

@@ -1,5 +1,4 @@
 {% extends 'flatpages/default.html' %}
-<!--{% load i18n %}-->
 {% load custom_filters %}
 {% load custom_tags %}
 {% block title %}
@@ -7,79 +6,66 @@ Ad
 {% endblock title %}
 
 {% block content %}
-<h1>Все  Объявления</h1>
-
-<hr>
-
-<a href="{% url 'search' %}"class="btn btn-secondary btn-sm">Найти Объявления</a>
-<h3>{% current_time '%d %b %Y' %}</h3>
-<h3>{{ blogs|length }} Blogs</h3>
-        {% if perms.blogs.add_blog %}
-        <a href="{% url 'create' %}"class="btn btn-secondary btn-sm">Добавить Объявление</a>
-        {% endif %}
-{% if blogs %}
-<table>
-{% for blog in blogs %}
-    <tr>
-        <td>Описание</td>
-        <td>Текст</td>
-        <td>дата</td>
-        <td> Изображение </td>
-        {# Условие получается составным. #}
-        {% if perms.blogs.change_blog or perms.blogs.delete_blog %}
-        <td>Действия</td>
-        {% endif %}
-    </tr>
-    <tr>
-        <td><a href="{% url 'blog' blog.id %}">{{ blog.title }}</a></td>
-        <td>{{ blog.content }}</td>
-        <td>{{ blog.created_at }}</td>
-        <td>{{ blog.author }}</td>
-        <td>
-            {% if blog.image %}
-                <img src="{{ MEDIA_URL }}{{ blog.image.url }}" width="500">
+    <h1>Все Объявления</h1>
+    <hr>
+    <a href="{% url 'search' %}" class="btn btn-secondary btn-sm">Найти Объявления</a>
+    <h3>{% current_time '%d %b %Y' %}</h3>
+    <h3>{{ blogs|length }} Blogs</h3>
+    {% if perms.blogs.add_blog %}
+        <a href="{% url 'create' %}" class="btn btn-secondary btn-sm">Добавить Объявление</a>
+    {% endif %}
+    {% if blogs %}
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Описание</th>
+                <th>Текст</th>
+                <th>Дата</th>
+                <th>Изображение</th>
+                {% if perms.blogs.change_blog or perms.blogs.delete_blog %}
+                    <th>Действия</th>
+                {% endif %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for blog in blogs %}
+                <tr>
+                    <td><a href="{% url 'blog' blog.id %}">{{ blog.title }}</a></td>
+                    <td>{{ blog.content }}</td>
+                    <td>{{ blog.created_at }}</td>
+                    <td>
+                        {% if blog.image %}
+                            <img src="{{ MEDIA_URL }}{{ blog.image.url }}" width="500">
+                        {% endif %}
+                    </td>
+                    {% if request.user.is_authenticated %}
+                        <td>
+                            {% if blog.author.authorUser == request.user %}
+                                <a href="{% url 'blogs_edit' blog.id %}" class="btn btn-secondary btn-sm">Изменить</a>
+                            {% endif %}
+                            {% if blog.author.authorUser == request.user %}
+                                <a href="{% url 'blogs_delete' blog.id %}" class="btn btn-danger btn-sm">Удалить</a>
+                            {% endif %}
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <hr>
+    {% else %}
+        <h2>"Новостей нет!"</h2>
+    {% endif %}
+    {% if page_obj.has_previous or page_obj.has_next %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; первая</a>
+                <a href="?page={{ page_obj.previous_page_number }}">&lsaquo; предыдущая</a>
             {% endif %}
-        </td>
-        {% if request.user.is_authenticated %}
-        <td>
-            {%  if blog.author.authorUser == request.user  %}
-            {# А здесь доступ для каждой ссылки теперь будем проверять отдельно #}
-                <a href="{% url 'blogs_edit' blog.id %}" class="btn btn-secondary btn-sm">Изменить</a>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">следующая &rsaquo;</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">последняя &raquo;</a>
             {% endif %}
-            {% if blog.author.authorUser == request.user %}
-                <a href="{% url 'blogs_delete' blog.id %}">Удалить</a>
-            {% endif %}
-
-
-        </td>
-        {% endif %}
-    </tr>
-{% endfor %}
-</table>
-
-</table>
-<hr>
-{% else %}
-<h2>"Новостей нет!"</h2>
-{% endif %}
-{# Информация о предыдущих страницах #}
-{% if page_obj.has_previous %}
-<a href="?page=1">1</a>
-{% if page_obj.previous_page_number != 1 %}
-...
-<a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
-{% endif %}
-{% endif %}
-
-{# Информация о текущей странице #}
-{{ page_obj.number }}
-
-{# Информация о следующих страницах #}
-{% if page_obj.has_next %}
-<a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
-{% if paginator.num_pages != page_obj.next_page_number %}
-...
-<a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
-{% endif %}
-{% endif %}
+        </div>
+    {% endif %}
 {% endblock content %}

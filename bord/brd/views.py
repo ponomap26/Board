@@ -1,9 +1,9 @@
 from datetime import datetime
 
+import self as self
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
-from lib2to3.fixes.fix_input import context
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
@@ -31,7 +31,6 @@ class BlogsList(ListView):
     # Его надо указать, чтобы обратиться к списку объектов в html-шаблоне.
     context_object_name = 'blogs'
     paginate_by = 10
-    # context['user_is_author'] = context['user_'] == context['ad_author']
 
 
 class BlogsDetail(DetailView):
@@ -103,21 +102,6 @@ class BlogsDelete(LoginRequiredMixin, DeleteView):
     template_name = 'blogs_delete.html'
     success_url = reverse_lazy('blogs')
 
-    # @login_required
-    # def edit_ad(request, ad_id):
-    #     ad = get_object_or_404(Ad, id=ad_id)
-    #     if request.user == ad.author.authorUser:
-    #         return redirect('home')
-    #     if request.method == 'POST':
-    #         form = BlogsDelete(request.POST, instance=ad)
-    #         if form.is_valid():
-    #             ad = form.save(commit=False)
-    #             ad.save()
-    #             return redirect('blogs_delete', ad_id=ad.id)
-    #     else:
-    #         form = BlogsDelete(instance=ad)
-    #     return render(request, 'blog_delete.html', {'form': form, 'ad': ad})
-
 
 class BlogsUpdate(LoginRequiredMixin, UpdateView):
     raise_exception = True
@@ -149,6 +133,9 @@ def form_valid(self, form):
     return super().form_valid(form)
 
 
+"""ОТЗЫВЫ"""
+
+
 class ResponseList(LoginRequiredMixin, ListView):
     model = Response
     # Поле, которое будет использоваться для сортировки объектов
@@ -161,10 +148,22 @@ class ResponseList(LoginRequiredMixin, ListView):
     context_object_name = 'response_list'
     paginate_by = 10
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['ad_list'] = Ad.objects.all()
-        return context
+
+class ResponseDelete(LoginRequiredMixin, DeleteView):
+    raise_exception = True
+    model = Response
+    template_name = 'response_delete.html'
+    success_url = reverse_lazy('responses')
+
+
+class UserResponseListView(LoginRequiredMixin, ListView):
+    model = Response
+    template_name = 'user_response_list.html'
+    context_object_name = 'responses'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Response.objects.filter(ad__created_by__user=self.request.user)
 
 
 @login_required
@@ -182,32 +181,3 @@ def add_response(request, pk):
         form = ResponseForm()
 
     return render(request, 'add_response.html', {'ad': ad, 'form': form})
-
-# def add_comment_view(request, ad_id):
-#     """
-#     Обработчик формы добавления комментария.
-#     """
-#     ad = Ad.objects.get(id=ad_id)
-#
-#     if request.method == 'POST':
-#         form = ResponseForm(request.POST)
-#
-#         if form.is_valid():
-#             name = form.cleaned_data['name']
-#             body = form.cleaned_data['body']
-#
-#             text = Response.objects.create(
-#                 ad=ad,
-#                 name=name
-#
-#             )
-#
-#             return redirect('blog', blog_id=ad.blog.id)
-#
-#     else:
-#         form = ResponseForm()
-#
-#     return render(request, 'add_comment.html', {'form': form})
-
-
-# class ResponseDelete(LoginRequiredMixin, DeleteView):

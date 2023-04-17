@@ -1,15 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 """модель для категорий объявлений"""
 
-# class Category(models.Model):
-#     NEWS = "NW"
-#     ARTICLE = "AT"
-#     CATEGORY_CHOICES = (
-#         (NEWS, 'НОВОСТЬ'),
-#         (ARTICLE, 'СТАТЬЯ'),)
-#     name = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+
 
 
 """модель для профиля пользователя"""
@@ -71,6 +66,7 @@ class Ad(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     image = models.ImageField(upload_to='media/', blank=True, null=True, max_length=255)
+    file = models.FileField(upload_to='blogs/', blank=True, null=True)
 
     # def __str__(self):
     #     return f'{self.name}'

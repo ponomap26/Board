@@ -1,14 +1,48 @@
 {% extends 'flatpages/default.html' %}
 {% block title %}
-Response
+Ad
 {% endblock title %}
-  {% if ad.responses.all %}
-    <h2>Отклики ({{ ad.responses.count }})</h2>
-    {% for response in ad.responses.all %}
-      <div>
-        <p>{{ response.text }}</p>
-        <p>Автор: {{ response.author }}</p>
-        <p>Дата: {{ response.created_at }}</p>
-      </div>
-    {% endfor %}
-  {% endif %}
+
+
+    {% if blogs %}
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Описание</th>
+                <th>Текст</th>
+                <th>Дата</th>
+                <th>Изображение</th>
+                {% if perms.blogs.change_blog or perms.blogs.delete_blog %}
+                    <th>Действия</th>
+                {% endif %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for blog in blogs %}
+                <tr>
+                    <td><a href="{% url 'blog' blog.id %}">{{ blog.title }}</a></td>
+                    <td>{{ blog.content }}</td>
+                    <td>{{ blog.created_at }}</td>
+                    <td>
+                        {% if blog.image %}
+                            <img src="{{ MEDIA_URL }}{{ blog.image.url }}" width="500">
+                        {% endif %}
+                    </td>
+                    {% if request.user.is_authenticated %}
+                        <td>
+                            {% if blog.author.authorUser == request.user %}
+                                <a href="{% url 'blogs_edit' blog.id %}" class="btn btn-secondary btn-sm">Изменить</a>
+                            {% endif %}
+                            {% if blog.author.authorUser == request.user %}
+                                <a href="{% url 'blogs_delete' blog.id %}" class="btn btn-danger btn-sm">Удалить</a>
+                            {% endif %}
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <hr>
+    {% else %}
+        <h2>"Новостей нет!"</h2>
+    {% endif %}

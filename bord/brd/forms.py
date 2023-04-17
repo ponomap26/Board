@@ -7,10 +7,10 @@ from django.core.exceptions import ValidationError
 
 class BordForm(forms.ModelForm):
     title = forms.CharField(min_length=15)
-
+    file = forms.FileField(required=False)
     class Meta:
         model = Ad
-        fields = ['category', 'content', 'title', 'image']
+        fields = ['category', 'content', 'title', 'image', 'file']
 
 
 class ResponseForm(forms.ModelForm):

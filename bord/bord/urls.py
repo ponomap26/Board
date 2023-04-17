@@ -21,7 +21,7 @@ from django.urls import path, include # new
 from django.conf.urls.static import static # new
 
 from accounts.views import endreg
-from accounts.views_2 import activate
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),

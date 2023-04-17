@@ -14,6 +14,7 @@ Ad
             <th>Описание</th>
             <th>Текст</th>
             <th>Дата создания</th>
+            <th>Файлы</th>
             <th>Изображение</th>
             <th>Действия</th>
         </tr>
@@ -24,7 +25,12 @@ Ad
             <td>{{ blog.content }}</td>
             <td>{{ blog.created_at }}</td>
             <td>
-                {% if blog.image %}
+                {% if blog.file %}
+                 <a href="{{ MEDIA_URL }}{{ blog.file.url }}">Скачать файл</a>
+                {% endif %}
+            </td>
+            <td>
+                {% if blog.file %}
                     <img src="{{ MEDIA_URL }}{{ blog.image.url }}" width="500">
                 {% endif %}
             </td>

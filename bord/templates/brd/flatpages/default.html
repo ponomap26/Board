@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 {% if user.is_authenticated %}
-    <p>Привет, {{ user.username }} !</p>
+    <p>Ваш НИК: {{ user.username }} !</p>
 {% else %}
     <p>Добро пожаловать, Гость!</p>
 {% endif %}
@@ -23,7 +23,10 @@
              <a class="btn btn-secondary btn-sm" href="/accounts/login/">{"Вход"}</a>
 
           </td>
+            <td class="nav-item">
+                         <a class="btn btn-secondary btn-sm" href="/blogs/responses/">{"Отклики"}</a>
 
+                      </td>
              <a class="btn btn-secondary btn-sm" href="/blogs/">ВСЕ НОВОСТИ</a>
         {% load static %}
         <!-- Core theme CSS (includes Bootstrap)-->

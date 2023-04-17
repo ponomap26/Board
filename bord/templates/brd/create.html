@@ -8,5 +8,8 @@ Post
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Добавить" />
+    {% if blog.file %}
+    <a href="{{ MEDIA_URL }}{{ blog.file.url }}">Скачать файл</a>
+    {% endif %}
 </form>
 {% endblock content %}
