@@ -1,11 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-
 """модель для категорий объявлений"""
-
-
-
 
 """модель для профиля пользователя"""
 
@@ -80,9 +76,9 @@ class Response(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     accepted = models.BooleanField(default=False)
+
     class Meta:
         ordering = ['-created_at']
-
 
     # def delete(self, *args, **kwargs):
     #     self.ad.has_responses = False
@@ -94,8 +90,9 @@ class Response(models.Model):
     #     self.ad.save()
     #     self.ad.accepted_response = self
     #     self.ad.save()
-"""модель для уведомлений"""
 
+
+"""модель для уведомлений"""
 
 # class Notification(models.Model):
 #     user = models.ForeignKey(Profile, on_delete=models.CASCADE)

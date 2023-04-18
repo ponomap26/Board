@@ -8,15 +8,16 @@ from django.utils.html import strip_tags
 
 from .models import Response
 
-from django.db.models.signals import post_save, m2m_changed
+from django.db.models.signals import post_save, m2m_changed, pre_save
 
 from django.core.mail import send_mail
 
 from django.dispatch import receiver
 
-from .views import accept_response
+from .views import accept_response, add_response
+
 #
-# request_finished.connect(accept_response)
+# request_finished.connect(add_response)
 
 
 @receiver(post_save, sender=Response)
@@ -35,18 +36,23 @@ def send_notification_email(sender, instance, created, **kwargs):
         send_mail(subject, message, from_email, recipient_list)
 
 
-@receiver(m2m_changed, sender = Response)
+@receiver(m2m_changed, sender=Response)
 def accept_response_signal(sender, instance, **kwargs):
     if instance.accepted:
-        print("Accepted")
+
         return
+    print("Accepted")
     instance.accepted = True
     instance.save()
 
     # Отправка сообщения на email автора отзыва
     subject = 'Ваш отзыв принят'
-    message = render_to_string('response_accepted.html', {'response': instance})
-    plain_message = strip_tags(message)
-    from_email = settings.DEFAULT_FROM_EMAIL
+
+    message = render_to_string('response_accepted.html', {
+
+
+
+    })
+    from_email = 'noreply@example.com'
     recipient_list = [instance.author.email]
-    send_mail(subject, plain_message, from_email, recipient_list, html_message=message)
+    send_mail(subject, message, from_email, recipient_list)

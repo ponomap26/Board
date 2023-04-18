@@ -241,6 +241,3 @@ def accept_response(request, response_id):
         messages.success(request, 'Отзыв успешно принят')
 
     return redirect('user_responses')
-
-
-
