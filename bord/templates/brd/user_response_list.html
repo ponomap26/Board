@@ -2,28 +2,44 @@
 
 {% block content %}
   <h1>Отклики на объявление {{ ad.title }}</h1>
-  {% if responses %}
- <a href="{% url 'response_search' %}" class="btn btn-secondary btn-sm">Отфильтровать</a>
-    <table class="table">
-      <thead>
+ {% if responses %}
+  <a href="{% url 'response_search' %}" class="btn btn-secondary btn-sm">Отфильтровать</a>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Объявление</th>
+        <th>Отклики</th>
+        <th>Автор</th>
+        <th>Дата создания</th>
+        <th>Действия</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for response in responses %}
         <tr>
-          <th>Объявление</th>
-          <th>Отклики</th>
-          <th>Автор</th>
-          <th>Дата создания</th>
+          <td>{{ response.ad.title }}</td>
+          <td>{{ response.text }}</td>
+          <td>{{ response.author }}</td>
+          <td>{{ response.created_at }}</td>
+          <td>
+            {% if response.ad.accepted_response == response %}
+              Отклик принят
+            {% else %}
+              <form method="POST" action="{% url 'accept_response' response.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary btn-sm">Принять отклик</button>
+              </form>
+            {% endif %}
+            <form method="POST" action="{% url 'responses_delete' response.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm">Удалить отклик</button>
+            </form>
+          </td>
         </tr>
-      </thead>
-      <tbody>
-        {% for response in responses %}
-          <tr>
-            <td>{{ response.ad.title }}</td>
-            <td>{{ response.text }}</td>
-            <td>{{ response.author }}</td>
-            <td>{{ response.created_at }}</td>
-          </tr>
         {% empty %}
           <tr>
-            <td colspan="4">На ваше объявление пока нет откликов.</td>
+            <td colspan="5">На ваше объявление пока нет откликов.</td>
           </tr>
         {% endfor %}
       </tbody>
@@ -32,3 +48,50 @@
     <p>На ваше объявление пока нет откликов.</p>
   {% endif %}
 {% endblock %}
+
+
+{% if responses %}
+  <a href="{% url 'response_search' %}" class="btn btn-secondary btn-sm">Отфильтровать</a>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Объявление</th>
+        <th>Отклики</th>
+        <th>Автор</th>
+        <th>Дата создания</th>
+        <th>Действия</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for response in responses %}
+        <tr>
+          <td>{{ response.ad.title }}</td>
+          <td><a href="{{ response.get_absolute_url }}">{{ response.text }}</a></td>
+          <td>{{ response.author }}</td>
+          <td>{{ response.created_at }}</td>
+          <td>
+             {% if response.ad.accepted_response == response %}
+              <span class="text-success">Принято</span>
+            {% else %}
+              <form method="POST" action="{% url 'accept_response' response.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary btn-sm">Принять отклик</button>
+              </form>
+            {% endif %}
+            <form method="POST" action="{% url 'responses_delete' response.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm">Удалить отклик</button>
+            </form>
+          </td>
+        </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5">На ваше объявление пока нет откликов.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>На ваше объявление пока нет откликов.</p>
+  {% endif %}

@@ -1,0 +1,15 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+{% load custom_tags %}
+ghhjgjhvjh
+{% block title %}
+    {{ response.text }}
+{% endblock title %}
+
+{% block content %}
+    <h1>{{ response.text }}</h1>
+    <p>Автор: {{ response.author }}</p>
+    <p>Дата создания: {{ response.created_at }}</p>
+    <p><a href="{% url 'ad_detail' response.ad.id %}">{{ response.ad.title }}</a></p>
+    <p>{{ response.text }}</p>
+{% endblock content %}

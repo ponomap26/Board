@@ -153,3 +153,4 @@ EMAIL_HOST_USER = "eveonline81@yandex.ru"
 EMAIL_HOST_PASSWORD = "HOST_PASSWORD"
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
+DEFAULT_FROM_EMAIL = 'ponomap26@yandex.ru'

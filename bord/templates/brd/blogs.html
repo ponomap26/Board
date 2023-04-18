@@ -19,6 +19,7 @@ Ad
             <thead>
             <tr>
                 <th>Описание</th>
+                <th>Автор</th>
                 <th>Текст</th>
                 <th>Дата</th>
                 <th>Изображение</th>
@@ -31,6 +32,7 @@ Ad
             {% for blog in blogs %}
                 <tr>
                     <td><a href="{% url 'blog' blog.id %}">{{ blog.title }}</a></td>
+                    <td>{{ blog.author }}</td>
                     <td>{{ blog.content }}</td>
                     <td>{{ blog.created_at }}</td>
                     <td>
@@ -40,10 +42,10 @@ Ad
                     </td>
                     {% if request.user.is_authenticated %}
                         <td>
-                            {% if blog.author.authorUser == request.user %}
+                            {% if blog.author == request.user %}
                                 <a href="{% url 'blogs_edit' blog.id %}" class="btn btn-secondary btn-sm">Изменить</a>
                             {% endif %}
-                            {% if blog.author.authorUser == request.user %}
+                            {% if blog.author == request.user %}
                                 <a href="{% url 'blogs_delete' blog.id %}" class="btn btn-danger btn-sm">Удалить</a>
                             {% endif %}
                         </td>

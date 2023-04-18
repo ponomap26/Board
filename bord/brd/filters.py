@@ -27,15 +27,15 @@ class BlogFilter(FilterSet):
 
 
 class ResponseFilter(FilterSet):
-    # added_after = DateTimeFilter(
-    #     field_name='created_at',
-    #     lookup_expr='gt',
-    #     label="Дата публикации не позднее",
-    #     widget=DateTimeInput(
-    #         format='%Y-%m-%d',
-    #         attrs={'type': 'datetime-local'},
-    #     )
-    # )
+    added_after = DateTimeFilter(
+        field_name='created_at',
+        lookup_expr='gt',
+        label="Дата публикации не позднее",
+        widget=DateTimeInput(
+            format='%Y-%m-%d',
+            attrs={'type': 'datetime-local'},
+        )
+    )
     title = CharFilter(
         field_name='title',
         lookup_expr='exact',

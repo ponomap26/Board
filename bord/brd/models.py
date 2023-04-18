@@ -57,7 +57,7 @@ class Ad(models.Model):
         (КВЕСТГИВЕРЫ, 'КВЕСТГИВЕРЫ'),
     )
 
-    author = models.ForeignKey(Author, on_delete=models.CASCADE, help_text="Автор")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, help_text="Автор")
     title = models.CharField(max_length=200)
     content = models.TextField()
     category = models.CharField(max_length=200, choices=CATEGORY_CHOICES,
@@ -79,10 +79,21 @@ class Response(models.Model):
     ad = models.ForeignKey(Ad, on_delete=models.CASCADE, related_name='responses')
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    accepted = models.BooleanField(default=False)
     class Meta:
         ordering = ['-created_at']
 
+
+    # def delete(self, *args, **kwargs):
+    #     self.ad.has_responses = False
+    #     self.ad.save()
+    #     super().delete(*args, **kwargs)
+    #
+    # def accept(self):
+    #     self.ad.has_responses = False
+    #     self.ad.save()
+    #     self.ad.accepted_response = self
+    #     self.ad.save()
 """модель для уведомлений"""
 
 

@@ -1,14 +1,11 @@
 {% extends 'flatpages/default.html' %}
 {% block content %}
 <h1>Отклики на объявление </h1>
-<form method="get">
-    <label for="title-filter">Filter by title:</label>
-    <select name="title" id="title-filter">
-        {% for title in titles %}
-            <option value="{{ title }}">{{ title }}</option>
-        {% endfor %}
-    </select>
-    <button type="submit">Filter</button>
+<form action="" method="get">
+    {# Переменная, которую мы передали через контекст, может сгенерировать нам форму с полями #}
+    {{ filtersets.form.as_p }}
+    {# Добавим кнопку отправки данных формы #}
+    <input type="submit" value="Найти"/>
 </form>
 <hr>
 {% if search %}

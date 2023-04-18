@@ -1,12 +1,15 @@
+from django.contrib import messages
 from django.contrib.auth.models import User
+from django.core.signals import request_finished
 from django.http import HttpResponseRedirect
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, PermissionDenied
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 
 from .filters import BlogFilter, ResponseFilter
@@ -83,7 +86,7 @@ class BlogsCreate(PermissionRequiredMixin, CreateView):
             # Если объект Author не существует, создаем его
             author = Author.objects.create(authorUser=user)
         # Устанавливаем созданного автора и пользователя для Ad
-        ad.author = author
+        ad.author = user
         ad.created_by = user.profile
         # Сохраняем объект Ad
         ad.save()
@@ -144,11 +147,25 @@ class ResponseList(LoginRequiredMixin, ListView):
     paginate_by = 10
 
 
+class ResponseDetail(DetailView):
+    model = Response
+    template_name = 'response_detail.html'
+    context_object_name = 'response_detail'
+    queryset = Response.objects.all()
+
+
 class ResponseDelete(LoginRequiredMixin, DeleteView):
-    raise_exception = True
     model = Response
     template_name = 'response_delete.html'
-    success_url = reverse_lazy('responses')
+    success_url = reverse_lazy('user_responses')
+    raise_exception = True
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset=queryset)
+        if not obj.author == self.request.user:
+            if not self.request.user.is_superuser:
+                raise PermissionDenied
+        return obj
 
 
 class ResponseSearch(ListView):
@@ -177,11 +194,6 @@ class ResponseSearch(ListView):
         context['filtersets'] = self.filterset
         # context['all_blogs'] = Ad.objects.all()
         return context
-        titles = Ad.objects.order_by('title').values_list('title', flat=True).distinct()
-        # Добавляем список в контекст представления
-        context['titles'] = titles
-        return context
-
 
 
 class UserResponseListView(LoginRequiredMixin, ListView):
@@ -209,3 +221,26 @@ def add_response(request, pk):
         form = ResponseForm()
 
     return render(request, 'add_response.html', {'ad': ad, 'form': form})
+
+
+# @require_POST
+# def delete_response(request, response_id):
+#     response = get_object_or_404(Response, id=response_id, author=request.user)
+#     response.delete()
+#     return redirect('user_responses')
+
+
+def accept_response(request, response_id):
+    response = get_object_or_404(Response, pk=response_id)
+    if response.accepted:
+        # Отзыв уже принят, выводим сообщение об ошибке
+        messages.error(request, 'Отзыв уже был принят')
+    else:
+        response.accepted = True
+        response.save()
+        messages.success(request, 'Отзыв успешно принят')
+
+    return redirect('user_responses')
+
+
+

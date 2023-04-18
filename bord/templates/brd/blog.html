@@ -59,7 +59,7 @@ Ad
         <tbody>
             {% for response in blog.responses.all %}
                 <tr>
-                    {% if blog.author.authorUser == request.user %}
+                    {% if blog.author == request.user %}
                         <td>{{ response.text }}</td>
                         <td>{{ response.author }}</td>
                         <td>{{ response.created_at }}</td>
