@@ -36,12 +36,11 @@ def send_notification_email(sender, instance, created, **kwargs):
         send_mail(subject, message, from_email, recipient_list)
 
 
-@receiver(m2m_changed, sender=Response)
+@receiver(pre_save, sender=Response)
 def accept_response_signal(sender, instance, **kwargs):
     if instance.accepted:
-
         return
-    print("Accepted")
+
     instance.accepted = True
     instance.save()
 
@@ -49,9 +48,7 @@ def accept_response_signal(sender, instance, **kwargs):
     subject = 'Ваш отзыв принят'
 
     message = render_to_string('response_accepted.html', {
-
-
-
+        'response': instance,
     })
     from_email = 'noreply@example.com'
     recipient_list = [instance.author.email]
